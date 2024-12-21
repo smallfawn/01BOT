@@ -70,28 +70,37 @@ async function handleGroupMessage(message, client) {
         send_group_msg(client, groupId, '点赞成功')
     }
     //这里应该判断是否为管理员
-    /**
-     * if (message['message'].includes('ban')) {
+    if (message['message'].includes('ban')) {
         //支持ban @xxx 7200
         //支持ban QQ号 7200
         //不传入时间默认为1小时
-        console.log(`匹配ban`);
-
-        let userId = message['message'].split(' ')[1]
-
-
-        let duration = message['message'].split(' ')[2]
-        console.log(`ban用户：${userId}`);
-
         let groupId = getGroupId(message)
-        console.log(`ban群：${groupId}`);
-        if (duration) {
-            set_group_ban(client, groupId, userId, duration)
+        console.log(`匹配ban`);
+        let userIdAdmin = getUserId(message)
+        if (userIdAdmin == '7777777') {
+            let userId = message['message'].split(' ')[1]
 
-        } else {
-            set_group_ban(client, groupId, userId)
+
+            let duration = message['message'].split(' ')[2]
+            console.log(`ban用户：${userId}`);
+
+
+            console.log(`ban群：${groupId}`);
+            if (userId && groupId) {
+                if (duration) {
+                    set_group_ban(client, groupId, userId, duration)
+
+                } else {
+                    set_group_ban(client, groupId, userId)
+                }
+            }
+
+
         }
+
+    } else {
+        send_group_msg(client, groupId, '您不是管理员，无法执行此命令，自ban60s')
     }
-     */
+
 
 }

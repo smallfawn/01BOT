@@ -330,14 +330,24 @@ function send_like(client, user_id) {
  * @param {*} group_id 
  * @param {*} user_id 
  */
-function set_group_ban(client, group_id, user_id) {
+function set_group_ban(client, group_id, user_id, duration = 3600) {
+    const containsCQat = user_id.includes('CQ:at');
+    if (containsCQat) {
+        const regex = /qq=(\d+)/;
+        const match = user_id.match(regex);
+        if (match) {
+            const qqValue = match[1];
+            user_id = qqValue;
+        }
+    }
+
     let echo = uuid();
     client.send(JSON.stringify({
         action: "set_group_ban",
         params: {
             "group_id": group_id,
             "user_id": user_id,
-            "duration": 0
+            "duration": duration
         },
         "echo": echo
     }));

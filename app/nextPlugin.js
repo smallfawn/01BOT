@@ -1,4 +1,4 @@
-const { send_private_msg, waitReply, getUserId, send_like, send_group_msg, getGroupId } = require('./sender.js');
+const { send_private_msg, waitReply, getUserId, send_like, send_group_msg, getGroupId, set_group_ban } = require('./sender.js');
 
 
 module.exports = {
@@ -48,6 +48,7 @@ async function handlePrivateMessage(message, client) {
         send_private_msg(client, userId, '点赞成功')
     }
 
+
 }
 /**
  * 处理群聊
@@ -56,7 +57,7 @@ async function handlePrivateMessage(message, client) {
  */
 async function handleGroupMessage(message, client) {
     console.log(`匹配群聊`);
-    
+
     if (message['message'].includes('赞我')) {
         console.log(`匹配群聊1`);
         let userId = getUserId(message)
@@ -64,8 +65,29 @@ async function handleGroupMessage(message, client) {
         let groupId = getGroupId(message)
         console.log(`点赞用户：${userId}`);
         console.log(`点赞群：${groupId}`);
-        
-        
+
+
         send_group_msg(client, groupId, '点赞成功')
+    }
+    if (message['message'].includes('ban')) {
+        //支持ban @xxx 7200
+        //支持ban QQ号 7200
+        //不传入时间默认为1小时
+        console.log(`匹配ban`);
+
+        let userId = message['message'].split(' ')[1]
+
+
+        let duration = message['message'].split(' ')[2]
+        console.log(`ban用户：${userId}`);
+
+        let groupId = getGroupId(message)
+        console.log(`ban群：${groupId}`);
+        if (duration) {
+            set_group_ban(client, groupId, userId, duration)
+
+        } else {
+            set_group_ban(client, groupId, userId)
+        }
     }
 }

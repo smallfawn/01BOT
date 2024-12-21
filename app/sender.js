@@ -20,39 +20,40 @@ function wait(ms) {
  */
 function send_private_msg(client, user_id, message) {
     // 定义消息类型和内容
-    let type = 'text';
-    let msgContent = [];
+    let messageType = 'text';
+    let messageContent = {};
 
     // 如果message是对象，并且包含类型和消息内容，则使用这些值
-    if (typeof message === 'object' && message !== null && message.type && message.path) {
-        type = message.type;
-        if (type === 'image') {
-            msgContent = [
-                {
-                    "type": type,
-                    "data": {
-                        // 本地路径
-                        "file": message.path
-
-                        // 网络路径
-                        // "file": "http://i0.hdslb.com/bfs/archive/c8fd97a40bf79f03e7b76cbc87236f612caef7b2.png"
-
-                        //base64编码
-                        // "file:": "base64://xxxxxxxx"
-                    }
+    if (typeof message === 'object' && message !== null) {
+        messageType = message.type || messageType;
+        if (messageType === 'image') {
+            messageContent = { type: 'image', path: message.path };
+        } else {
+            messageContent = { type: messageType, text: message.msg };
+        }
+        // 如果存在回复ID，添加回复类型的消息
+        if (message.toMsgId) {
+            msgContents.push({
+                type: 'reply',
+                data: {
+                    id: message.toMsgId
                 }
-            ]
+            });
         }
     } else if (typeof message === 'string') {
-        msgContent = [
-            {
-                type: type,
-                data: {
-                    text: message
-                }
-            }
-        ]
+        messageContent = { text: message };
     }
+
+    // 构建消息内容数组
+    let msgContents = [
+        {
+            type: messageType,
+            data: messageContent
+        }
+    ];
+
+
+
     // 生成唯一的echo值
     let echo = uuid();
 
@@ -72,51 +73,47 @@ function send_private_msg(client, user_id, message) {
     // 返回echo值
     return echo;
 }
-
 /**
  * 发送群消息
  * @param {Object} client - 客户端对象，用于发送消息
- * @param {String} group_id - 群组ID
+ * @param {String} groupId - 群组ID
  * @param {String|Object} message - 要发送的消息，可以是文本或者包含类型和消息内容的对象
  * @returns {String} echo - 用于标识此次消息发送的唯一ID
  */
-function send_group_msg(client, group_id, message) {
+function send_group_msg(client, groupId, message) {
+
     // 定义消息类型和内容
-    let type = 'text';
-    let msgContent = [];
+    let messageType = 'text';
+    let messageContent = {};
 
     // 如果message是对象，并且包含类型和消息内容，则使用这些值
-    if (typeof message === 'object' && message !== null && message.type && message.path) {
-        type = message.type;
-        if (type === 'image') {
-            msgContent = [
-                {
-                    "type": type,
-                    "data": {
-                        // 本地路径
-                        "file": message.path
-
-                        // 网络路径
-                        // "file": "http://i0.hdslb.com/bfs/archive/c8fd97a40bf79f03e7b76cbc87236f612caef7b2.png"
-
-                        //base64编码
-                        // "file:": "base64://xxxxxxxx"
-                    }
+    if (typeof message === 'object' && message !== null) {
+        messageType = message.type || messageType;
+        if (messageType === 'image') {
+            messageContent = { type: 'image', path: message.path };
+        } else {
+            messageContent = { type: messageType, text: message.msg };
+        }
+        // 如果存在回复ID，添加回复类型的消息
+        if (message.toMsgId) {
+            msgContents.push({
+                type: 'reply',
+                data: {
+                    id: message.toMsgId
                 }
-            ]
+            });
         }
     } else if (typeof message === 'string') {
-        msgContent = [
-            {
-                type: type,
-                data: {
-                    text: message
-                }
-            }
-        ]
+        messageContent = { text: message };
     }
 
-
+    // 构建消息内容数组
+    let msgContents = [
+        {
+            type: messageType,
+            data: messageContent
+        }
+    ];
     // 生成唯一的echo值
     let echo = uuid();
 
@@ -124,19 +121,23 @@ function send_group_msg(client, group_id, message) {
     let msgObject = {
         action: "send_group_msg",
         params: {
-            group_id: group_id,
-            message: msgContent
+            group_id: groupId,
+            message: msgContents
         },
         echo: echo
     };
 
     // 发送消息
-    client.send(JSON.stringify(msgObject));
+    try {
+        client.send(JSON.stringify(msgObject));
+    } catch (error) {
+        console.error('Failed to send message:', error);
+        throw error;
+    }
 
     // 返回echo值
     return echo;
-}
-/**
+}/**
  * 撤回消息
  * @param {*} client 
  * @param {*} message_id 

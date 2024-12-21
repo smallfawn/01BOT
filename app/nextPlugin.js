@@ -14,7 +14,9 @@ async function handlePrivateMessage(message, client) {
     if (message['message'].includes('查询卡密')) {
         let userId = getUserId(message)
         send_private_msg(client, userId, '请输入卡密');
-        
+        //发送图片
+        send_private_msg(client, userId, { type: "image", path: 'https://i0.hdslb.com/bfs/archive/c8fd97a40bf79f03e7b76cbc87236f612caef7b2.png' });
+        //path:"base64://xxxxxxxx"
         // 等待用户回复，设置超时时间为30秒
         const reply = await waitReply(client, userId, 60 * 1000);
         if (reply) {

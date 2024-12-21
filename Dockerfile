@@ -4,4 +4,4 @@ COPY package.json .
 RUN npm install
 COPY . .
 EXPOSE 3333
-RUN npm start
+CMD npm start

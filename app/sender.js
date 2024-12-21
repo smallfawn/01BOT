@@ -62,7 +62,7 @@ function send_private_msg(client, user_id, message) {
         action: "send_private_msg",
         params: {
             user_id: user_id,
-            message: msgContent
+            message: msgContents
         },
         echo: echo
     };

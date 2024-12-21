@@ -21,7 +21,7 @@ async function handlePrivateMessage(message, client) {
 
         //发送文字
         //send_private_msg(client, userId, '请输入卡密');
-        //send_private_msg(client, userId, { type: "text", msg: '请输入卡密' });
+        send_private_msg(client, userId, { type: "text", msg: '请输入卡密' });
 
         //回复消息
         // {msg:"回复消息",toMsgId:消息ID 数字格式}

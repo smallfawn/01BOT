@@ -11,7 +11,13 @@ function uuid() {
 function wait(ms) {
     return new Promise(resolve => setTimeout(resolve, ms))
 }
-
+/**
+ * 发送私聊消息
+ * @param {*} client 
+ * @param {*} user_id 
+ * @param {*} message 
+ * @returns 
+ */
 function send_private_msg(client, user_id, message) {
     let echo = uuid();
     client.send(JSON.stringify({
@@ -33,6 +39,13 @@ function send_private_msg(client, user_id, message) {
     return echo
 }
 
+/**
+ * 发送群消息
+ * @param {*} client 
+ * @param {*} group_id 
+ * @param {*} message 
+ * @returns 
+ */
 function send_group_msg(client, group_id, message) {
     let echo = uuid();
     client.send(JSON.stringify({
@@ -53,6 +66,12 @@ function send_group_msg(client, group_id, message) {
     }));
     return echo
 }
+/**
+ * 撤回消息
+ * @param {*} client 
+ * @param {*} message_id 
+ * @returns 
+ */
 function delete_msg(client, message_id) {
     let echo = uuid();
     client.send(JSON.stringify({
@@ -65,6 +84,13 @@ function delete_msg(client, message_id) {
     }));
     return echo
 }
+/**
+ * 等待消息
+ * @param {*} client 
+ * @param {*} user_id 
+ * @param {*} timeout 
+ * @returns 
+ */
 
 function waitReply(client, user_id, timeout) {
     return new Promise((resolve, reject) => {
@@ -74,9 +100,9 @@ function waitReply(client, user_id, timeout) {
                 console.log(`匹配`);
 
                 // 匹配成功后移除监听器
-                client.removeListener('message', listener); 
+                client.removeListener('message', listener);
                 // 清除超时计时器
-                clearTimeout(timeoutId); 
+                clearTimeout(timeoutId);
                 resolve(msg['message']); // 解析Promise
             }
         };
@@ -90,10 +116,46 @@ function waitReply(client, user_id, timeout) {
         }, timeout);
     });
 }
+/**
+ * 获取用户ID
+ * @param {*} message 
+ * @returns 
+ */
+function getUserId(message) {
+    return message['user_id']
+}
+/**
+ * 获取用户名
+ * @param {*} message 
+ */
+function getUserName(message) {
+
+}
+/**
+ * 获取消息ID
+ */
+function getMsgId() {
+
+}
+/**
+ * 获取群聊ID
+ */
+
+function getGroupId() {
+
+}
+/**
+ * 获取群聊名
+ */
+function getGroupName() {
+
+}
+
 module.exports = {
     send_private_msg,
     send_group_msg,
     delete_msg,
     wait,
-    waitReply
+    waitReply,
+    getUserId
 }

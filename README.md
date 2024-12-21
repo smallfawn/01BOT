@@ -8,6 +8,8 @@
 
 插件编写详情看 app/nextPlugin.js  暂时只有处理群聊和处理私聊
 
-DOCKER命令
+函数参数说明看 app/sender.js
+
+DOCKER命令 
 
 docker run -d -p 3333:3333 --name 01bot -v $(PWD)/nextPlugin.js:/app/nextPlugin.js -e TZ="Asia/Shanghai" --restart=always 01bot

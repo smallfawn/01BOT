@@ -27,7 +27,7 @@ function send_private_msg(client, user_id, message) {
     if (typeof message === 'object' && message !== null) {
         messageType = message.type || messageType;
         if (messageType === 'image') {
-            messageContent = { type: 'image', path: message.path };
+            messageContent = { file: message.path };
         } else {
             messageContent = { type: messageType, text: message.msg };
         }
@@ -51,6 +51,7 @@ function send_private_msg(client, user_id, message) {
             data: messageContent
         }
     ];
+
 
 
 
@@ -90,7 +91,7 @@ function send_group_msg(client, groupId, message) {
     if (typeof message === 'object' && message !== null) {
         messageType = message.type || messageType;
         if (messageType === 'image') {
-            messageContent = { type: 'image', path: message.path };
+            messageContent = { file: message.path };
         } else {
             messageContent = { type: messageType, text: message.msg };
         }

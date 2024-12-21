@@ -1,4 +1,4 @@
-const { send_private_msg, waitReply, getUserId } = require('./sender.js');
+const { send_private_msg, waitReply, getUserId, send_like, send_group_msg, getGroupId } = require('./sender.js');
 
 
 module.exports = {
@@ -13,15 +13,15 @@ module.exports = {
 async function handlePrivateMessage(message, client) {
     if (message['message'].includes('查询卡密')) {
         let userId = getUserId(message)
-        send_private_msg(client, userId, '请输入卡密');
+        //send_private_msg(client, userId, '请输入卡密');
 
         //发送图片
-        send_private_msg(client, userId, { type: "image", path: 'https://i0.hdslb.com/bfs/archive/c8fd97a40bf79f03e7b76cbc87236f612caef7b2.png' });
+        //send_private_msg(client, userId, { type: "image", path: 'https://i0.hdslb.com/bfs/archive/c8fd97a40bf79f03e7b76cbc87236f612caef7b2.png' });
         //path:"base64://xxxxxxxx"
 
         //发送文字
         //send_private_msg(client, userId, '请输入卡密');
-        send_private_msg(client, userId, { type: "text", msg: '请输入卡密TEXT' });
+        //send_private_msg(client, userId, { type: "text", msg: '请输入卡密TEXT' });
 
         //发送图片和文字
         send_private_msg(client, userId, [{ type: "image", path: 'https://i0.hdslb.com/bfs/archive/c8fd97a40bf79f03e7b76cbc87236f612caef7b2.png' }, { type: "text", msg: '请输入卡密TEXT' }]);
@@ -42,6 +42,11 @@ async function handlePrivateMessage(message, client) {
             send_private_msg(client, userId, '您没有在规定时间内回复，操作已取消。');
         }
     }
+    if (message['message'].includes('赞我')) {
+        send_like(client, message['user_id'])
+        let userId = getUserId(message)
+        send_private_msg(client, userId, '点赞成功')
+    }
 
 }
 /**
@@ -50,5 +55,17 @@ async function handlePrivateMessage(message, client) {
  * @param {*} client 
  */
 async function handleGroupMessage(message, client) {
-
+    console.log(`匹配群聊`);
+    
+    if (message['message'].includes('赞我')) {
+        console.log(`匹配群聊1`);
+        let userId = getUserId(message)
+        send_like(client, userId)
+        let groupId = getGroupId(message)
+        console.log(`点赞用户：${userId}`);
+        console.log(`点赞群：${groupId}`);
+        
+        
+        send_group_msg(client, groupId, '点赞成功')
+    }
 }

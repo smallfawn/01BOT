@@ -26,15 +26,17 @@ function send_private_msg(client, user_id, message) {
 
     if (Array.isArray(message)) {
         message.forEach(msg => {
+
+
             let msgType = msg.type || 'text';
             let msgContent = {};
 
             if (msgType === 'image') {
                 msgContent = { file: msg.path };
             } else if (msgType === 'text') {
+
+
                 msgContent = { text: msg.msg };
-            } else {
-                return; // 如果消息类型不支持，则跳过当前消息
             }
 
             // 如果存在回复ID，添加回复类型的消息
@@ -54,8 +56,12 @@ function send_private_msg(client, user_id, message) {
             });
         });
     }
+
+
     // 如果message是对象，并且包含类型和消息内容，则使用这些值
-    if (typeof message === 'object' && message !== null) {
+    if (typeof message === 'object' && message !== null && !Array.isArray(message)) {
+
+
         messageType = message.type || messageType;
         if (messageType === 'image') {
             messageContent = { file: message.path };
@@ -79,11 +85,7 @@ function send_private_msg(client, user_id, message) {
         });
     }
 
-    // 构建消息内容数组
-    msgContents.push({
-        type: messageType,
-        data: messageContent
-    });
+
 
 
 
@@ -127,15 +129,17 @@ function send_group_msg(client, groupId, message) {
 
     if (Array.isArray(message)) {
         message.forEach(msg => {
+
+
             let msgType = msg.type || 'text';
             let msgContent = {};
 
             if (msgType === 'image') {
                 msgContent = { file: msg.path };
             } else if (msgType === 'text') {
+
+
                 msgContent = { text: msg.msg };
-            } else {
-                return; // 如果消息类型不支持，则跳过当前消息
             }
 
             // 如果存在回复ID，添加回复类型的消息
@@ -155,8 +159,12 @@ function send_group_msg(client, groupId, message) {
             });
         });
     }
+
+
     // 如果message是对象，并且包含类型和消息内容，则使用这些值
-    if (typeof message === 'object' && message !== null) {
+    if (typeof message === 'object' && message !== null && !Array.isArray(message)) {
+
+
         messageType = message.type || messageType;
         if (messageType === 'image') {
             messageContent = { file: message.path };
@@ -180,11 +188,9 @@ function send_group_msg(client, groupId, message) {
         });
     }
 
-    // 构建消息内容数组
-    msgContents.push({
-        type: messageType,
-        data: messageContent
-    });
+
+    //console.log(msgContents);
+
     // 生成唯一的echo值
     let echo = uuid();
 
@@ -300,6 +306,24 @@ function getGroupName(message) {
 
 
 }
+/**
+ * 01赞我
+ * @param {*} client 
+ * @param {*} user_id 
+ * @returns 
+ */
+function send_like(client, user_id) {
+    let echo = uuid();
+    client.send(JSON.stringify({
+        action: "send_like",
+        params: {
+            "user_id": user_id,
+            "times": 0
+        },
+        "echo": echo
+    }));
+    return echo
+}
 
 module.exports = {
     send_private_msg,
@@ -307,5 +331,10 @@ module.exports = {
     delete_msg,
     wait,
     waitReply,
-    getUserId
+    getUserId,
+    send_like,
+    getGroupId,
+    getGroupName,
+    getMsgId,
+    getUserName
 }

@@ -23,8 +23,11 @@ async function handlePrivateMessage(message, client) {
         //send_private_msg(client, userId, '请输入卡密');
         send_private_msg(client, userId, { type: "text", msg: '请输入卡密TEXT' });
 
+        //发送图片和文字
+        send_private_msg(client, userId, [{ type: "image", path: 'https://i0.hdslb.com/bfs/archive/c8fd97a40bf79f03e7b76cbc87236f612caef7b2.png' }, { type: "text", msg: '请输入卡密TEXT' }]);
+
         //回复消息
-        // {msg:"回复消息",toMsgId:消息ID 数字格式}
+        // {type: "text",msg:"回复消息",toMsgId:消息ID 数字格式}
 
 
         // 等待用户回复，设置超时时间为30秒

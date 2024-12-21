@@ -15,14 +15,45 @@ function wait(ms) {
  * 发送私聊消息
  * @param {Object} client - 客户端对象，用于发送消息
  * @param {String} user_id - 接收消息的用户ID
- * @param {String|Object} message - 要发送的消息，可以是文本或者包含类型和消息内容的对象
+ * @param {String|Object|Array} message - 要发送的消息，可以是文本或者包含类型和消息内容的对象
  * @returns {String} echo - 用于标识此次消息发送的唯一ID
  */
 function send_private_msg(client, user_id, message) {
     // 定义消息类型和内容
     let messageType = 'text';
     let messageContent = {};
+    let msgContents = []; // 先初始化msgContents数组
 
+    if (Array.isArray(message)) {
+        message.forEach(msg => {
+            let msgType = msg.type || 'text';
+            let msgContent = {};
+
+            if (msgType === 'image') {
+                msgContent = { file: msg.path };
+            } else if (msgType === 'text') {
+                msgContent = { text: msg.msg };
+            } else {
+                return; // 如果消息类型不支持，则跳过当前消息
+            }
+
+            // 如果存在回复ID，添加回复类型的消息
+            if (msg.toMsgId) {
+                msgContents.push({
+                    type: 'reply',
+                    data: {
+                        id: msg.toMsgId
+                    }
+                });
+            }
+
+            // 将当前消息添加到消息内容数组
+            msgContents.push({
+                type: msgType,
+                data: msgContent
+            });
+        });
+    }
     // 如果message是对象，并且包含类型和消息内容，则使用这些值
     if (typeof message === 'object' && message !== null) {
         messageType = message.type || messageType;
@@ -42,15 +73,17 @@ function send_private_msg(client, user_id, message) {
         }
     } else if (typeof message === 'string') {
         messageContent = { text: message };
+        msgContents.push({
+            type: messageType,
+            data: messageContent
+        });
     }
 
     // 构建消息内容数组
-    let msgContents = [
-        {
-            type: messageType,
-            data: messageContent
-        }
-    ];
+    msgContents.push({
+        type: messageType,
+        data: messageContent
+    });
 
 
 
@@ -83,15 +116,45 @@ function send_private_msg(client, user_id, message) {
  * 发送群消息
  * @param {Object} client - 客户端对象，用于发送消息
  * @param {String} groupId - 群组ID
- * @param {String|Object} message - 要发送的消息，可以是文本或者包含类型和消息内容的对象
+ * @param {String|Object|Array} message - 要发送的消息，可以是文本或者包含类型和消息内容的对象
  * @returns {String} echo - 用于标识此次消息发送的唯一ID
  */
 function send_group_msg(client, groupId, message) {
-
     // 定义消息类型和内容
     let messageType = 'text';
     let messageContent = {};
+    let msgContents = []; // 先初始化msgContents数组
 
+    if (Array.isArray(message)) {
+        message.forEach(msg => {
+            let msgType = msg.type || 'text';
+            let msgContent = {};
+
+            if (msgType === 'image') {
+                msgContent = { file: msg.path };
+            } else if (msgType === 'text') {
+                msgContent = { text: msg.msg };
+            } else {
+                return; // 如果消息类型不支持，则跳过当前消息
+            }
+
+            // 如果存在回复ID，添加回复类型的消息
+            if (msg.toMsgId) {
+                msgContents.push({
+                    type: 'reply',
+                    data: {
+                        id: msg.toMsgId
+                    }
+                });
+            }
+
+            // 将当前消息添加到消息内容数组
+            msgContents.push({
+                type: msgType,
+                data: msgContent
+            });
+        });
+    }
     // 如果message是对象，并且包含类型和消息内容，则使用这些值
     if (typeof message === 'object' && message !== null) {
         messageType = message.type || messageType;
@@ -111,15 +174,17 @@ function send_group_msg(client, groupId, message) {
         }
     } else if (typeof message === 'string') {
         messageContent = { text: message };
+        msgContents.push({
+            type: messageType,
+            data: messageContent
+        });
     }
 
     // 构建消息内容数组
-    let msgContents = [
-        {
-            type: messageType,
-            data: messageContent
-        }
-    ];
+    msgContents.push({
+        type: messageType,
+        data: messageContent
+    });
     // 生成唯一的echo值
     let echo = uuid();
 

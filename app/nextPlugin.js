@@ -77,6 +77,8 @@ async function handleGroupMessage(message, client) {
         let groupId = getGroupId(message)
         console.log(`匹配ban`);
         let userIdAdmin = getUserId(message)
+        console.log(userIdAdmin);
+
         if (userIdAdmin == '7777777') {
             let userId = message['message'].split(' ')[1]
 
@@ -96,10 +98,11 @@ async function handleGroupMessage(message, client) {
             }
 
 
+        } else {
+            let groupId = getGroupId(message)
+            send_group_msg(client, groupId, '您不是管理员，无法执行此命令，自ban60s')
         }
 
-    } else {
-        send_group_msg(client, groupId, '您不是管理员，无法执行此命令，自ban60s')
     }
 
 

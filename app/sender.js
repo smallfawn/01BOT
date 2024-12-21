@@ -324,6 +324,25 @@ function send_like(client, user_id) {
     }));
     return echo
 }
+/**
+ * 群内禁言
+ * @param {*} client 
+ * @param {*} group_id 
+ * @param {*} user_id 
+ */
+function set_group_ban(client, group_id, user_id) {
+    let echo = uuid();
+    client.send(JSON.stringify({
+        action: "set_group_ban",
+        params: {
+            "group_id": group_id,
+            "user_id": user_id,
+            "duration": 0
+        },
+        "echo": echo
+    }));
+    return echo
+}
 
 module.exports = {
     send_private_msg,
@@ -336,5 +355,6 @@ module.exports = {
     getGroupId,
     getGroupName,
     getMsgId,
-    getUserName
+    getUserName,
+    set_group_ban
 }

@@ -69,7 +69,9 @@ async function handleGroupMessage(message, client) {
 
         send_group_msg(client, groupId, '点赞成功')
     }
-    if (message['message'].includes('ban')) {
+    //这里应该判断是否为管理员
+    /**
+     * if (message['message'].includes('ban')) {
         //支持ban @xxx 7200
         //支持ban QQ号 7200
         //不传入时间默认为1小时
@@ -90,4 +92,6 @@ async function handleGroupMessage(message, client) {
             set_group_ban(client, groupId, userId)
         }
     }
+     */
+
 }

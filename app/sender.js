@@ -69,7 +69,12 @@ function send_private_msg(client, user_id, message) {
     };
 
     // 发送消息
-    client.send(JSON.stringify(msgObject));
+    try {
+        client.send(JSON.stringify(msgObject));
+    } catch (error) {
+        console.error('Failed to send message:', error);
+        //throw error;
+    }
 
     // 返回echo值
     return echo;
@@ -133,7 +138,7 @@ function send_group_msg(client, groupId, message) {
         client.send(JSON.stringify(msgObject));
     } catch (error) {
         console.error('Failed to send message:', error);
-        throw error;
+        //throw error;
     }
 
     // 返回echo值
@@ -184,7 +189,8 @@ function waitReply(client, user_id, timeout) {
         const timeoutId = setTimeout(() => {
             client.removeListener('message', listener); // 移除监听器
             console.log(`超时`);
-            reject(new Error('超时')); // 拒绝Promise
+            //reject(new Error('超时')); // 拒绝Promise
+            resolve(false);
         }, timeout);
     });
 }

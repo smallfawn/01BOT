@@ -5,7 +5,11 @@ module.exports = {
     handlePrivateMessage,
     handleGroupMessage
 }
-
+/**
+ * 处理私聊
+ * @param {*} message 
+ * @param {*} client 
+ */
 async function handlePrivateMessage(message, client) {
     if (message['message'].includes('查询卡密')) {
         send_private_msg(client, message['user_id'], '请输入卡密');
@@ -24,6 +28,11 @@ async function handlePrivateMessage(message, client) {
     }
 
 }
+/**
+ * 处理群聊
+ * @param {*} message 
+ * @param {*} client 
+ */
 async function handleGroupMessage(message, client) {
 
 }

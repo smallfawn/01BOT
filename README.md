@@ -6,6 +6,7 @@
 反向代理地址 IP+端口(3333)
 
 
+插件编写详情看 app/nextPlugin.js  暂时只有处理群聊和处理私聊
 
 DOCKER命令
 

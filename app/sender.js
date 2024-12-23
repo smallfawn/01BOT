@@ -24,9 +24,7 @@ class sender {
     getGroupId() {
         //这里应该是群聊ID
     }
-    getGroupMsgId() {
-        //群消息ID 用于撤回
-    }
+
     getGroupName() {
         return this.message["sender"]["card"];
     }
@@ -167,7 +165,7 @@ class sender {
                         this.client.removeListener('message', listener);
                         // 清除超时计时器
                         clearTimeout(timeoutId);
-                        resolve(null);
+                        resolve(false);
                     }
                     if (result === null) {
                         //继续监听

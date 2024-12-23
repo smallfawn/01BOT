@@ -23,8 +23,11 @@ module.exports = async (s) => {
         if (input_wait) {
             await s.reply('匹配成功' + input_wait.getMsg())
         }
-        if (!input_wait) {
-            await s.reply('监听超时/退出')
+        if (input_wait == false) {
+            await s.reply('监听退出')
+        }
+        if (input_wait == null) {
+            await s.reply('监听超时退出')
         }
 
     } catch (error) {

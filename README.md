@@ -6,9 +6,9 @@
 反向代理地址 IP+端口(3333)
 
 
-插件编写详情看 app/nextPlugin.js  暂时只有处理群聊和处理私聊
+插件编写详情看 app/nextPlugin2.js
 
-函数参数说明看 app/sender.js
+函数引入和触发关键词参数说明看 app/sender.js
 
 DOCKER命令 
 

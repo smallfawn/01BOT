@@ -11,6 +11,8 @@ class sender {
         this.userId = msgConfig.userId;
         this.groupId = msgConfig.groupId;
         this.messageType = msgConfig.type;
+        this.callback = null;
+        this.waitTime = 0;
         //this.messageData = {};
         /*this.client.on("message", (data) => {
             this.messageData = JSON.parse(data.toString("utf8"));
@@ -150,7 +152,12 @@ class sender {
         // 返回echo值
         return echo;
     }
-    async waitInput(callback, time) {
+    async waitInput(callback, waitTime) {
+
+
+        this.callback = callback;
+        this.waitTime = waitTime;
+
         return new Promise((resolve, reject) => {
             const listener = (data) => {
                 let msg = JSON.parse(data.toString('utf8'));
@@ -161,11 +168,10 @@ class sender {
                     this.client.removeListener('message', listener);
                     // 清除超时计时器
                     clearTimeout(timeoutId);
-                    resolve(callback(new sender(this.client, msg, {
-                        type: msg["message_type"],
-                        userId: msg["user_id"],
-                        groupId: msg['group_id'] || null
-                    }))); // 解析Promise
+
+                    this.message = msg;
+
+                    resolve(callback(this)); // 解析Promise
                 }
             };
             this.client.on('message', listener);
@@ -175,10 +181,19 @@ class sender {
                 this.client.removeListener('message', listener); // 移除监听器
                 console.log(`超时`);
                 resolve(null); // 超时时resolve为null
-            }, time);
+            }, waitTime);
         });
     }
-    async again() { }
+
+    async again(message) {
+        // 发送错误消息
+        await this.reply(message);
+
+        
+
+        
+
+    }
     async isAdmin() { }
 }
 function uuid() {

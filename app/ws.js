@@ -16,7 +16,7 @@ server.on('connection', (client) => {
             })
 
 
-            require('./newPlugin')(s);
+            require('./nextPlugin')(s);
         }
     });
 });

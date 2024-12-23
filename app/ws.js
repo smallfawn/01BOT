@@ -13,6 +13,7 @@ server.on('connection', (client) => {
                 userId: message['user_id'],
                 groupId: message['group_id'] || null
             });
+
             //引入插件和触发关键词
             if (message['message'].includes('测试')) {
                 //关键词测试

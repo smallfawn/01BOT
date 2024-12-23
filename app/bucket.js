@@ -14,7 +14,7 @@ class Bucket {
                 return JSON.parse(fs.readFileSync(this.filePath));
             }
         } catch (error) {
-            console.error('Error loading data:', error);
+            console.error('加载存储桶失败:', error);
         }
         return {};
     }
@@ -23,7 +23,7 @@ class Bucket {
         try {
             fs.writeFileSync(this.filePath, JSON.stringify(this.data));
         } catch (error) {
-            console.error('Error saving data:', error);
+            console.error('保存存储桶失败:', error);
         }
     }
 

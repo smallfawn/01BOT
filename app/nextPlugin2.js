@@ -15,4 +15,9 @@ module.exports = async (s) => {
     //await s.delMsg(msgId);
 
     //回复和监听消息 看nextPlugin.js
+
+    const bucket = require('./bucket')
+    const test = new bucket('test')
+    test.set('test', '测试')
+    console.log(test.get('test'))
 }

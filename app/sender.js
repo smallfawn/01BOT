@@ -159,19 +159,30 @@ class sender {
         this.waitTime = waitTime;
 
         return new Promise((resolve, reject) => {
-            const listener = (data) => {
+            const listener = async (data) => {
                 let msg = JSON.parse(data.toString('utf8'));
                 if (msg['user_id'] === this.userId && msg['message_type'] === this.messageType) {
                     console.log(`匹配`);
-
-                    // 匹配成功后移除监听器
-                    this.client.removeListener('message', listener);
-                    // 清除超时计时器
-                    clearTimeout(timeoutId);
-
                     this.message = msg;
+                    const result = await callback(this);
+                    console.log(`结果` + result);
 
-                    resolve(callback(this)); // 解析Promise
+                    if (result) {
+                        // 匹配成功后移除监听器
+                        this.client.removeListener('message', listener);
+                        // 清除超时计时器
+                        clearTimeout(timeoutId);
+
+
+
+                        resolve(this); // 解析Promise并返回msg对象
+                        //resolve(callback(this)); // 解析Promise
+
+
+
+                    }
+
+
                 }
             };
             this.client.on('message', listener);
@@ -189,9 +200,9 @@ class sender {
         // 发送错误消息
         await this.reply(message);
 
-        
 
-        
+
+
 
     }
     async isAdmin() { }

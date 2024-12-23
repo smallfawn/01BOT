@@ -1,16 +1,22 @@
 const ws = require('ws');
-const { handlePrivateMessage, handleGroupMessage } = require('./nextPlugin'); // 一次性导入
-
+const sender = require('./sender');
 const server = new ws.Server({ port: 3333 });
 
 server.on('connection', (client) => {
     console.log('连接成功');
     client.on('message', async (data) => {
         let message = JSON.parse(data.toString('utf8'));
-        if (message.message_type === 'private') {
-            await handlePrivateMessage(message, client);
-        } else if (message.message_type === 'group') {
-            await handleGroupMessage(message, client);
+        if (message['message'] && message['message'].includes('测试')) {
+
+
+            let s = new sender(client, message['user_id'], {
+                type: message['message_type'],
+                userId: message['user_id'],
+                groupId: message['group_id'] || null
+            })
+
+
+            require('./newPlugin')(s);
         }
     });
 });

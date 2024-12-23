@@ -1,3 +1,186 @@
+class sender {
+    constructor(client, message, msgConfig) {
+        /*msgConfig = {
+            type: "private" || "group",
+            userId: '',
+            groupId: ""
+        }*/
+        this.message = message;
+        this.client = client;
+
+        this.userId = msgConfig.userId;
+        this.groupId = msgConfig.groupId;
+        this.messageType = msgConfig.type;
+        //this.messageData = {};
+        /*this.client.on("message", (data) => {
+            this.messageData = JSON.parse(data.toString("utf8"));
+
+        });*/
+    }
+
+    getMsg() {
+        return this.message["message"];
+    }
+    getMsgId() {
+        return this.message["message_id"];
+    }
+    getUserId() {
+        return this.message["user_id"];
+    }
+    getUserName() {
+        return this.message["sender"]["nickname"];
+    }
+
+    getGroupId() {
+        //这里应该是群消息ID
+    }
+    getGroupName() {
+        return this.message["sender"]["card"];
+    }
+    async delMsg(message_id) {
+        let echo = uuid();
+        this.client.send(JSON.stringify({
+            action: "delete_msg",
+            params: {
+                "message_id": message_id
+            },
+
+            "echo": echo
+        }));
+        return echo
+    }
+    async reply(message) {
+        // 定义消息类型和内容
+        let messageType = 'text';
+        let messageContent = {};
+        let msgContents = []; // 先初始化msgContents数组
+
+        if (Array.isArray(message)) {
+            message.forEach(msg => {
+
+
+                let msgType = msg.type || 'text';
+                let msgContent = {};
+
+                if (msgType === 'image') {
+                    msgContent = { file: msg.path };
+                } else if (msgType === 'text') {
+
+
+                    msgContent = { text: msg.msg };
+                }
+
+                // 如果存在回复ID，添加回复类型的消息
+                if (msg.toMsgId) {
+                    msgContents.push({
+                        type: 'reply',
+                        data: {
+                            id: msg.toMsgId
+                        }
+                    });
+                }
+
+                // 将当前消息添加到消息内容数组
+                msgContents.push({
+                    type: msgType,
+                    data: msgContent
+                });
+            });
+        }
+
+
+        // 如果message是对象，并且包含类型和消息内容，则使用这些值
+        if (typeof message === 'object' && message !== null && !Array.isArray(message)) {
+
+
+            messageType = message.type || messageType;
+            if (messageType === 'image') {
+                messageContent = { file: message.path };
+            } else {
+                messageContent = { type: messageType, text: message.msg };
+            }
+            // 如果存在回复ID，添加回复类型的消息
+            if (message.toMsgId) {
+                msgContents.push({
+                    type: 'reply',
+                    data: {
+                        id: message.toMsgId
+                    }
+                });
+            }
+        } else if (typeof message === 'string') {
+            messageContent = { text: message };
+            msgContents.push({
+                type: messageType,
+                data: messageContent
+            });
+        }
+        // 生成唯一的echo值
+        let echo = uuid();
+
+        // 构建发送的消息对象
+        let msgObject = {
+            action: "send_private_msg",
+            params: {
+                user_id: this.userId,
+                message: msgContents
+            },
+            echo: echo
+        };
+
+        if (this.messageType === 'group') {
+
+            msgObject = {
+                action: "send_group_msg",
+                params: {
+                    group_id: this.groupId,
+                    message: msgContents
+                },
+                echo: echo
+            };
+        }
+        // 发送消息
+        try {
+            this.client.send(JSON.stringify(msgObject));
+        } catch (error) {
+            console.error('Failed to send message:', error);
+            //throw error;
+        }
+
+        // 返回echo值
+        return echo;
+    }
+    async waitInput(callback, time) {
+        return new Promise((resolve, reject) => {
+            const listener = (data) => {
+                let msg = JSON.parse(data.toString('utf8'));
+                if (msg['user_id'] === this.userId && msg['message_type'] === this.messageType) {
+                    console.log(`匹配`);
+
+                    // 匹配成功后移除监听器
+                    this.client.removeListener('message', listener);
+                    // 清除超时计时器
+                    clearTimeout(timeoutId);
+                    resolve(callback(new sender(this.client, msg, {
+                        type: msg["message_type"],
+                        userId: msg["user_id"],
+                        groupId: msg['group_id'] || null
+                    }))); // 解析Promise
+                }
+            };
+            this.client.on('message', listener);
+
+            // 设置超时
+            const timeoutId = setTimeout(() => {
+                this.client.removeListener('message', listener); // 移除监听器
+                console.log(`超时`);
+                resolve(null); // 超时时resolve为null
+            }, time);
+        });
+    }
+    async again() { }
+    async isAdmin() { }
+}
 function uuid() {
     return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(
         /[xy]/g,
@@ -8,363 +191,4 @@ function uuid() {
         }
     );
 }
-function wait(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms))
-}
-/**
- * 发送私聊消息
- * @param {Object} client - 客户端对象，用于发送消息
- * @param {String} user_id - 接收消息的用户ID
- * @param {String|Object|Array} message - 要发送的消息，可以是文本或者包含类型和消息内容的对象
- * @returns {String} echo - 用于标识此次消息发送的唯一ID
- */
-function send_private_msg(client, user_id, message) {
-    // 定义消息类型和内容
-    let messageType = 'text';
-    let messageContent = {};
-    let msgContents = []; // 先初始化msgContents数组
-
-    if (Array.isArray(message)) {
-        message.forEach(msg => {
-
-
-            let msgType = msg.type || 'text';
-            let msgContent = {};
-
-            if (msgType === 'image') {
-                msgContent = { file: msg.path };
-            } else if (msgType === 'text') {
-
-
-                msgContent = { text: msg.msg };
-            }
-
-            // 如果存在回复ID，添加回复类型的消息
-            if (msg.toMsgId) {
-                msgContents.push({
-                    type: 'reply',
-                    data: {
-                        id: msg.toMsgId
-                    }
-                });
-            }
-
-            // 将当前消息添加到消息内容数组
-            msgContents.push({
-                type: msgType,
-                data: msgContent
-            });
-        });
-    }
-
-
-    // 如果message是对象，并且包含类型和消息内容，则使用这些值
-    if (typeof message === 'object' && message !== null && !Array.isArray(message)) {
-
-
-        messageType = message.type || messageType;
-        if (messageType === 'image') {
-            messageContent = { file: message.path };
-        } else {
-            messageContent = { type: messageType, text: message.msg };
-        }
-        // 如果存在回复ID，添加回复类型的消息
-        if (message.toMsgId) {
-            msgContents.push({
-                type: 'reply',
-                data: {
-                    id: message.toMsgId
-                }
-            });
-        }
-    } else if (typeof message === 'string') {
-        messageContent = { text: message };
-        msgContents.push({
-            type: messageType,
-            data: messageContent
-        });
-    }
-
-
-
-
-
-
-    // 生成唯一的echo值
-    let echo = uuid();
-
-    // 构建发送的消息对象
-    let msgObject = {
-        action: "send_private_msg",
-        params: {
-            user_id: user_id,
-            message: msgContents
-        },
-        echo: echo
-    };
-
-    // 发送消息
-    try {
-        client.send(JSON.stringify(msgObject));
-    } catch (error) {
-        console.error('Failed to send message:', error);
-        //throw error;
-    }
-
-    // 返回echo值
-    return echo;
-}
-/**
- * 发送群消息
- * @param {Object} client - 客户端对象，用于发送消息
- * @param {String} groupId - 群组ID
- * @param {String|Object|Array} message - 要发送的消息，可以是文本或者包含类型和消息内容的对象
- * @returns {String} echo - 用于标识此次消息发送的唯一ID
- */
-function send_group_msg(client, groupId, message) {
-    // 定义消息类型和内容
-    let messageType = 'text';
-    let messageContent = {};
-    let msgContents = []; // 先初始化msgContents数组
-
-    if (Array.isArray(message)) {
-        message.forEach(msg => {
-
-
-            let msgType = msg.type || 'text';
-            let msgContent = {};
-
-            if (msgType === 'image') {
-                msgContent = { file: msg.path };
-            } else if (msgType === 'text') {
-
-
-                msgContent = { text: msg.msg };
-            }
-
-            // 如果存在回复ID，添加回复类型的消息
-            if (msg.toMsgId) {
-                msgContents.push({
-                    type: 'reply',
-                    data: {
-                        id: msg.toMsgId
-                    }
-                });
-            }
-
-            // 将当前消息添加到消息内容数组
-            msgContents.push({
-                type: msgType,
-                data: msgContent
-            });
-        });
-    }
-
-
-    // 如果message是对象，并且包含类型和消息内容，则使用这些值
-    if (typeof message === 'object' && message !== null && !Array.isArray(message)) {
-
-
-        messageType = message.type || messageType;
-        if (messageType === 'image') {
-            messageContent = { file: message.path };
-        } else {
-            messageContent = { type: messageType, text: message.msg };
-        }
-        // 如果存在回复ID，添加回复类型的消息
-        if (message.toMsgId) {
-            msgContents.push({
-                type: 'reply',
-                data: {
-                    id: message.toMsgId
-                }
-            });
-        }
-    } else if (typeof message === 'string') {
-        messageContent = { text: message };
-        msgContents.push({
-            type: messageType,
-            data: messageContent
-        });
-    }
-
-
-    //console.log(msgContents);
-
-    // 生成唯一的echo值
-    let echo = uuid();
-
-    // 构建发送的消息对象
-    let msgObject = {
-        action: "send_group_msg",
-        params: {
-            group_id: groupId,
-            message: msgContents
-        },
-        echo: echo
-    };
-
-    // 发送消息
-    try {
-        client.send(JSON.stringify(msgObject));
-    } catch (error) {
-        console.error('Failed to send message:', error);
-        //throw error;
-    }
-
-    // 返回echo值
-    return echo;
-}/**
- * 撤回消息
- * @param {*} client 
- * @param {*} message_id 
- * @returns 
- */
-function delete_msg(client, message_id) {
-    let echo = uuid();
-    client.send(JSON.stringify({
-        action: "delete_msg",
-        params: {
-            "message_id": message_id
-        },
-
-        "echo": echo
-    }));
-    return echo
-}
-/**
- * 等待消息
- * @param {*} client 
- * @param {*} user_id 
- * @param {*} timeout 
- * @returns 
- */
-
-function waitReply(client, user_id, timeout) {
-    return new Promise((resolve, reject) => {
-        const listener = (data) => {
-            let msg = JSON.parse(data.toString('utf8'));
-            if (msg['user_id'] === user_id) {
-                console.log(`匹配`);
-
-                // 匹配成功后移除监听器
-                client.removeListener('message', listener);
-                // 清除超时计时器
-                clearTimeout(timeoutId);
-                resolve(msg['message']); // 解析Promise
-            }
-        };
-        client.on('message', listener);
-
-        // 设置超时
-        const timeoutId = setTimeout(() => {
-            client.removeListener('message', listener); // 移除监听器
-            console.log(`超时`);
-            //reject(new Error('超时')); // 拒绝Promise
-            resolve(false);
-        }, timeout);
-    });
-}
-/**
- * 获取用户ID
- * @param {*} message 
- * @returns 
- */
-function getUserId(message) {
-    return message['user_id']
-}
-/**
- * 获取用户名
- * @param {*} message 
- */
-function getUserName(message) {
-    return message['sender']['nickname']
-}
-/**
- * 获取消息ID
- * @param {*} message 
- * @returns 
- */
-function getMsgId(message) {
-    return message['message_id']
-}
-/**
- * 获取群号
- * @param {*} message 
- * @returns 
- */
-function getGroupId(message) {
-    return message['group_id']
-}
-/**
- * 获取群名
- * @param {*} message 
- * @returns 
- */
-function getGroupName(message) {
-    return message['sender']['card']
-
-
-}
-/**
- * 01赞我
- * @param {*} client 
- * @param {*} user_id 
- * @returns 
- */
-function send_like(client, user_id) {
-    let echo = uuid();
-    client.send(JSON.stringify({
-        action: "send_like",
-        params: {
-            "user_id": user_id,
-            "times": 0
-        },
-        "echo": echo
-    }));
-    return echo
-}
-/**
- * 群内禁言
- * @param {*} client 
- * @param {*} group_id 
- * @param {*} user_id 
- */
-function set_group_ban(client, group_id, user_id, duration = 3600) {
-    const containsCQat = user_id.includes('CQ:at');
-    if (containsCQat) {
-        const regex = /qq=(\d+)/;
-        const match = user_id.match(regex);
-        if (match) {
-            const qqValue = match[1];
-            user_id = qqValue;
-        }
-    }
-
-    let echo = uuid();
-    client.send(JSON.stringify({
-        action: "set_group_ban",
-        params: {
-            "group_id": group_id,
-            "user_id": user_id,
-            "duration": duration
-        },
-        "echo": echo
-    }));
-    return echo
-}
-
-module.exports = {
-    send_private_msg,
-    send_group_msg,
-    delete_msg,
-    wait,
-    waitReply,
-    getUserId,
-    send_like,
-    getGroupId,
-    getGroupName,
-    getMsgId,
-    getUserName,
-    set_group_ban
-}
+module.exports = sender;

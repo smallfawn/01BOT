@@ -3,4 +3,5 @@ COPY package.json .
 RUN npm install
 COPY . .
 EXPOSE 3333
-CMD npm start
+RUN npm install pm2
+CMD pm2 start app/ws.js --watch

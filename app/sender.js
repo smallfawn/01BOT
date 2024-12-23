@@ -23,6 +23,7 @@ class sender {
 
     getGroupId() {
         //这里应该是群聊ID
+        return this.message["group_id"];
     }
 
     getGroupName() {

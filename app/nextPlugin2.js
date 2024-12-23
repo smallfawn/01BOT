@@ -1,8 +1,8 @@
 module.exports = async (s) => {
     //getGroupName 获取群名
     let groupName = await s.getGroupName();
-    //getGroupId 获取群号 暂未写
-    //let groupId = await s.getGroupId();
+    //getGroupId 获取群号 
+    let groupId = await s.getGroupId();
     //getUserName 获取用户名
     let userName = await s.getUserName();
     //getUserId 获取用户id

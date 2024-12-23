@@ -1,23 +1,11 @@
 class sender {
     constructor(client, message, msgConfig) {
-        /*msgConfig = {
-            type: "private" || "group",
-            userId: '',
-            groupId: ""
-        }*/
         this.message = message;
         this.client = client;
-
         this.userId = msgConfig.userId;
         this.groupId = msgConfig.groupId;
         this.messageType = msgConfig.type;
-        this.callback = null;
-        this.waitTime = 0;
-        //this.messageData = {};
-        /*this.client.on("message", (data) => {
-            this.messageData = JSON.parse(data.toString("utf8"));
 
-        });*/
     }
 
     getMsg() {
@@ -34,7 +22,10 @@ class sender {
     }
 
     getGroupId() {
-        //这里应该是群消息ID
+        //这里应该是群聊ID
+    }
+    getGroupMsgId() {
+        //群消息ID 用于撤回
     }
     getGroupName() {
         return this.message["sender"]["card"];
@@ -152,11 +143,11 @@ class sender {
         // 返回echo值
         return echo;
     }
-    async waitInput(callback, waitTime) {
+    async listen(callback, waitTime) {
 
 
-        this.callback = callback;
-        this.waitTime = waitTime;
+
+
 
         return new Promise((resolve, reject) => {
             const listener = async (data) => {
@@ -165,9 +156,9 @@ class sender {
                     console.log(`匹配`);
                     this.message = msg;
                     const result = await callback(this);
-                    console.log(`结果` + result);
 
-                    if (result) {
+
+                    if (result === true) {
                         // 匹配成功后移除监听器
                         this.client.removeListener('message', listener);
                         // 清除超时计时器
@@ -181,6 +172,15 @@ class sender {
 
 
                     }
+                    if (result === false) {
+                        this.client.removeListener('message', listener);
+                        // 清除超时计时器
+                        clearTimeout(timeoutId);
+                        resolve(null);
+                    }
+                    if (result === null) {
+                        //继续监听
+                    }
 
 
                 }
@@ -190,21 +190,13 @@ class sender {
             // 设置超时
             const timeoutId = setTimeout(() => {
                 this.client.removeListener('message', listener); // 移除监听器
-                console.log(`超时`);
+
                 resolve(null); // 超时时resolve为null
             }, waitTime);
         });
     }
 
-    async again(message) {
-        // 发送错误消息
-        await this.reply(message);
 
-
-
-
-
-    }
     async isAdmin() { }
 }
 function uuid() {

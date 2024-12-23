@@ -20,9 +20,9 @@ server.on('connection', (client) => {
                 //插件nextPlugin
                 require('./nextPlugin')(s);
             }
-            if (message['message'].includes('测试2')) {
+            /*if (message['message'].includes('测试2')) {
                 require('./nextPlugin2')(s);
-            }
+            }*/
         }
     });
 });

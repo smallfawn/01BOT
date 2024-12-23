@@ -8,7 +8,7 @@ server.on('connection', (client) => {
     client.on('message', async (data) => {
         let message = JSON.parse(data.toString('utf8'));
         if (message['message']) {
-            let s = new sender(client, message['user_id'], {
+            let s = new sender(client, message, {
                 type: message['message_type'],
                 userId: message['user_id'],
                 groupId: message['group_id'] || null

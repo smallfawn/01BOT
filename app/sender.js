@@ -144,20 +144,12 @@ class sender {
         return echo;
     }
     async listen(callback, waitTime) {
-
-
-
-
-
         return new Promise((resolve, reject) => {
             const listener = async (data) => {
                 let msg = JSON.parse(data.toString('utf8'));
                 if (msg['user_id'] === this.userId && msg['message_type'] === this.messageType) {
-                    console.log(`匹配`);
                     this.message = msg;
                     const result = await callback(this);
-
-
                     if (result === true) {
                         // 匹配成功后移除监听器
                         this.client.removeListener('message', listener);
@@ -166,8 +158,7 @@ class sender {
 
 
 
-                        resolve(this); // 解析Promise并返回msg对象
-                        //resolve(callback(this)); // 解析Promise
+                        resolve(this);
 
 
 

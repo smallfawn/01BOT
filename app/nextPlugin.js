@@ -16,7 +16,7 @@ module.exports = async (s) => {
                 return false //退出监听
             } else {
                 await s.reply('匹配失败，重新输入')
-                return null //继续监听
+                //return null //继续监听 或者不写
             }
 
         }, 10 * 1000)

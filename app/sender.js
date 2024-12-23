@@ -55,11 +55,13 @@ class sender {
                 let msgContent = {};
 
                 if (msgType === 'image') {
-                    msgContent = { file: msg.path };
+                    msgContent = { file: msg.msg };
                 } else if (msgType === 'text') {
 
 
                     msgContent = { text: msg.msg };
+                } else if (msgType === 'video') {
+                    msgContent = { file: msg.msg };
                 }
 
                 // 如果存在回复ID，添加回复类型的消息
@@ -87,7 +89,9 @@ class sender {
 
             messageType = message.type || messageType;
             if (messageType === 'image') {
-                messageContent = { file: message.path };
+                messageContent = { file: message.msg };
+            } else if (messageType === 'video') {
+                messageContent = { file: message.msg };
             } else {
                 messageContent = { type: messageType, text: message.msg };
             }

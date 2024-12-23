@@ -21,7 +21,18 @@ module.exports = async (s) => {
 
         }, 10 * 1000)
         if (input_wait) {
-            await s.reply('匹配成功' + input_wait.getMsg())
+            //await s.reply({ type: 'text', msg: '匹配成功' })
+            //await s.reply('匹配成功' + input_wait.getMsg())
+            
+            //图片+文字
+            await s.reply([{ type: 'text', msg: '匹配成功' }, { type: 'image', msg: 'https://pic3.zhimg.com/v2-58d652598269710fa67ec8d1c88d8f03_r.jpg' }])
+            //await s.reply({ type: 'video', msg: "file://D:/a.jpg" })
+            //await s.reply({ type: 'image', msg: 'https://pic3.zhimg.com/v2-58d652598269710fa67ec8d1c88d8f03_r.jpg' })
+            //await s.reply({ type: 'image', msg: 'base64://xxxxxxxx' })
+            //await s.reply({ type: 'video', msg: "file://D:/a.mp4" })
+            //await s.reply({ type: 'video', msg: "https://pic3.xxxxx.mp4" })
+            //await s.reply({ type: 'video', msg: "base64://xxxxxxxx" })
+
         }
         if (input_wait == false) {
             await s.reply('监听退出')

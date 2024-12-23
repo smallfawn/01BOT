@@ -12,4 +12,4 @@
 
 DOCKER命令 
 
-docker run -d -p 3333:3333 --name 01bot -v $(PWD)/nextPlugin.js:/app/nextPlugin.js -e TZ="Asia/Shanghai" --restart=always 01bot
+docker run -d -p 3333:3333 --name 01bot -v $(PWD)/nextPlugin.js:/app/nextPlugin.js -e TZ="Asia/Shanghai" --restart=always smallfawn/01bot
